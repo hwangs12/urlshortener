@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const dns = require("dns");
+const { doesNotThrow } = require("assert");
 const app = express();
 
 // Basic Configuration
@@ -50,15 +51,13 @@ const validate_url = (req, res, next) => {
 	next();
 };
 
-app.use("/api/shorturl", validate_url);
-
 app.get("/", function (req, res) {
 	res.sendFile(process.cwd() + "/views/index.html");
 });
 
 // Your first API endpoint
 
-app.post("/api/shorturl", (req, res) => {
+app.post("/api/shorturl", validate_url, (req, res) => {
 	let newUrl = new Url({ shorturl: 1000, url: req.body.url });
 	newUrl.save();
 	const original_url = req.body.url;
@@ -66,12 +65,13 @@ app.post("/api/shorturl", (req, res) => {
 	res.json({ original_url, short_url });
 });
 
-app.get("/api/shorturl/:id", function (req, res) {
-	if (req.params.id === "1") {
-		res.redirect("https://www.google.com");
-	} else {
-		res.send("hello");
-	}
+app.get("/api/shorturl/:id", (req, res) => {
+	console.log(req.params.id);
+	res.send("hello world");
+	// await Url.findOne({ shorturl: parseInt(req.params.id) }, (err, data) => {
+	// 	return console.log(JSON.stringify(data));
+	// 	if (err) return console.log(err);
+	// });
 });
 
 app.listen(port, function () {
