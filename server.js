@@ -50,17 +50,7 @@ const validate_url = (req, res, next) => {
 	next();
 };
 
-const createAndSaveUrl = async (req, res, done, next) => {
-	console.log(req.body.url);
-	const newUrl = new Url({ id: 123, url: req.body.url });
-	await newUrl.save((err, data) => {
-		if (err) return done(err);
-		return done(null, data);
-	});
-	next();
-};
-
-app.use("/api/shorturl", validate_url, createAndSaveUrl);
+app.use("/api/shorturl", validate_url);
 
 app.get("/", function (req, res) {
 	res.sendFile(process.cwd() + "/views/index.html");
@@ -69,14 +59,14 @@ app.get("/", function (req, res) {
 // Your first API endpoint
 
 app.post("/api/shorturl", (req, res) => {
-	const url = new URL(req.body.url);
-
+	let newUrl = new Url({ shorturl: 1000, url: req.body.url });
+	newUrl.save();
 	const original_url = req.body.url;
-	const short_url = 123;
+	const short_url = 1000;
 	res.json({ original_url, short_url });
 });
 
-app.get("/api/hello/:id", function (req, res) {
+app.get("/api/shorturl/:id", function (req, res) {
 	if (req.params.id === "1") {
 		res.redirect("https://www.google.com");
 	} else {
